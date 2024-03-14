@@ -8,6 +8,7 @@ pub enum Operation {
     Subtract,
     Multiply,
     Divide,
+    Tanh,
 }
 
 #[derive(Debug, PartialEq)]
@@ -48,6 +49,15 @@ impl<'a> Node<'a> {
 
     pub fn set_label(&mut self, label: String) {
         self.label = Some(label);
+    }
+
+    pub fn tanh(&'a self) -> Node<'a> {
+        Node {
+            value: self.value.tanh(),
+            operands: vec![self],
+            operation: Some(Operation::Tanh),
+            label: None,
+        }
     }
 }
 
@@ -156,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn algebra() {
+    fn maths() {
         let a = Node::new(4.0);
         let b = Node::new(2.0);
         let c = &a + &b; // 4 + 2 = 6
@@ -183,5 +193,11 @@ mod tests {
         assert_eq!(g.value, f.value / b.value);
         assert!(std::ptr::eq(g.operands[0], &f) && std::ptr::eq(g.operands[1], &b));
         assert_eq!(g.operation, Some(Operation::Divide));
+
+        let h = g.tanh();
+
+        assert_eq!(h.value, g.value.tanh());
+        assert!(std::ptr::eq(h.operands[0], &g));
+        assert_eq!(h.operation, Some(Operation::Tanh));
     }
 }
