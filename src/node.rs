@@ -3,7 +3,7 @@ use std::fmt::format;
 use std::ops;
 
 #[derive(Debug, PartialEq)]
-enum Operation {
+pub enum Operation {
     Add,
     Subtract,
     Multiply,
@@ -11,15 +11,15 @@ enum Operation {
 }
 
 #[derive(Debug, PartialEq)]
-struct Node<'a> {
-    value: f64,
-    operands: Vec<&'a Node<'a>>,
-    operation: Option<Operation>,
-    label: Option<String>,
+pub struct Node<'a> {
+    pub value: f64,
+    pub operands: Vec<&'a Node<'a>>,
+    pub operation: Option<Operation>,
+    pub label: Option<String>,
 }
 
 impl<'a> Node<'a> {
-    fn new(value: f64) -> Self {
+    pub fn new(value: f64) -> Self {
         Node {
             value,
             operands: Vec::new(),
@@ -28,7 +28,7 @@ impl<'a> Node<'a> {
         }
     }
 
-    fn new_with_label(value: f64, label: String) -> Self {
+    pub fn new_with_label(value: f64, label: String) -> Self {
         Node {
             value,
             operands: Vec::new(),
@@ -46,7 +46,7 @@ impl<'a> Node<'a> {
         }
     }
 
-    fn set_label(&mut self, label: String) {
+    pub fn set_label(&mut self, label: String) {
         self.label = Some(label);
     }
 }
