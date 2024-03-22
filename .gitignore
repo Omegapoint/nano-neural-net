@@ -1,4 +1,5 @@
 /target
+.vscode
 
 # Ignore Graphviz generate files
 *.dot
