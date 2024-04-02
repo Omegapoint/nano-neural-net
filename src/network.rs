@@ -8,6 +8,8 @@ pub struct Edge {
 pub struct Network {
     pub nodes: Vec<Node>,
     pub edges: Vec<Edge>,
+    predecessors: Option<Vec<Vec<usize>>>, // Updated to Option
+    successors: Option<Vec<Vec<usize>>>,   // Updated to Option
 }
 
 impl Network {
@@ -15,6 +17,8 @@ impl Network {
         Network {
             nodes: Vec::new(),
             edges: Vec::new(),
+            predecessors: None, // Initialized as None
+            successors: None,   // Initialized as None
         }
     }
 
@@ -110,6 +114,20 @@ impl Network {
         }
         order.push(node_idx);
     }
+
+    pub fn build_adjacency_storage(&mut self) {
+        let node_count = self.nodes.len();
+        let mut predecessors = vec![vec![]; node_count];
+        let mut successors = vec![vec![]; node_count];
+
+        for edge in &self.edges {
+            predecessors[edge.to].push(edge.from);
+            successors[edge.from].push(edge.to);
+        }
+
+        self.predecessors = Some(predecessors);
+        self.successors = Some(successors);
+    }
 }
 
 #[cfg(test)]
@@ -148,5 +166,28 @@ mod tests {
 
         let topo_order = network.topological_sort();
         assert_eq!(topo_order, vec![idx_f, idx_e, idx_c, idx_a, idx_b, idx_d]); // Using DFS, so will explore "left" paths first
+    }
+
+    #[test]
+    fn test_adjacency_storage() {
+        let mut network = Network::new();
+
+        // Simulate adding nodes and edges; actual methods for adding might differ
+        let idx_a = network.add_node(Node::new(1.0)); // Node 0
+        let idx_b = network.add_node(Node::new(2.0)); // Node 1
+        let idx_c = network.add_node(Node::new(3.0)); // Node 2
+
+
+        let idx_d = network.add(idx_a, idx_b); // Node 3
+        let idx_e = network.add(idx_d, idx_c); // Node 4
+        let idx_f = network.multiply(idx_a, idx_e); // Node 5
+
+        network.build_adjacency_storage();
+
+        // Validate successors
+        assert_eq!(network.successors.unwrap(), vec![vec![3, 5], vec![3], vec![4], vec![4], vec![5], vec![]]);
+
+        // Validate predecessors
+        assert_eq!(network.predecessors.unwrap(), vec![vec![], vec![], vec![], vec![0, 1], vec![3, 2], vec![0, 4]]);
     }
 }
