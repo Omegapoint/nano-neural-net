@@ -87,6 +87,29 @@ impl Network {
 
         new_node_idx
     }
+
+    pub fn topological_sort(&self) -> Vec<usize> {
+        let mut visited = vec![false; self.nodes.len()];
+        let mut order = Vec::new();
+
+        for idx in 0..self.nodes.len() {
+            if !visited[idx] {
+                self.dfs(idx, &mut visited, &mut order);
+            }
+        }
+
+        order
+    }
+
+    fn dfs(&self, node_idx: usize, visited: &mut Vec<bool>, order: &mut Vec<usize>) {
+        visited[node_idx] = true;
+        for edge in &self.edges {
+            if edge.from == node_idx && !visited[edge.to] {
+                self.dfs(edge.to, visited, order);
+            }
+        }
+        order.push(node_idx);
+    }
 }
 
 #[cfg(test)]
@@ -110,5 +133,20 @@ mod tests {
         assert_eq!(network.nodes[idx_e].value, -1.0);
         assert_eq!(network.nodes[idx_f].value, 0.5);
         assert_eq!(network.nodes[idx_g].value, 0.7615941559557649);
+    }
+
+    #[test]
+    fn test_topological_ordering() {
+        let mut network = Network::new();
+
+        let idx_a = network.add_node(Node::new(1.0)); // 0
+        let idx_b = network.add_node(Node::new(2.0)); // 1
+        let idx_c = network.add(idx_a, idx_b); // 2
+        let idx_d = network.add_node(Node::new(3.0)); // 3
+        let idx_e = network.multiply(idx_c, idx_d); // 4
+        let idx_f = network.tanh(idx_e); // 5
+
+        let topo_order = network.topological_sort();
+        assert_eq!(topo_order, vec![idx_f, idx_e, idx_c, idx_a, idx_b, idx_d]); // Using DFS, so will explore "left" paths first
     }
 }

@@ -13,6 +13,7 @@ pub enum Operation {
 #[derive(Debug, PartialEq)]
 pub struct Node {
     pub value: f64,
+    pub gradient: f64,
     pub operation: Option<Operation>,
     pub label: Option<String>,
 }
@@ -21,6 +22,7 @@ impl Node {
     pub fn new(value: f64) -> Self {
         Node {
             value,
+            gradient: 0.0,
             operation: None,
             label: None,
         }
@@ -29,6 +31,7 @@ impl Node {
     pub fn new_with_label(value: f64, label: String) -> Self {
         Node {
             value,
+            gradient: 0.0,
             operation: None,
             label: Some(label),
         }
@@ -37,6 +40,7 @@ impl Node {
     pub fn new_with_operation(value: f64, operation: Operation) -> Self {
         Node {
             value,
+            gradient: 0.0,
             operation: Some(operation),
             label: None,
         }
